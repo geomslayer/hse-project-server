@@ -1,4 +1,5 @@
 import feedparser
+import time
 from models import *
 
 URL = 'https://lenta.ru/rss'
@@ -38,17 +39,12 @@ for entry in data.entries:
     news.category = category
     news.title = entry.title
     news.text = entry.summary
-    news.date = entry.published
+
+    # time in milliseconds
+    news.date = int(time.mktime(entry.published_parsed) * 1000)
     news.link = entry.id
 
     if len(entry.enclosures) > 0:
         news.img = entry.enclosures[0]['href']
 
     news.save()
-
-print(News.objects.count())
-print(Category.objects.count())
-
-
-# datetime.datetime.fromtimestamp(time.mktime(ent.published_parsed))
-# int(time.mktime(ent.published_parsed) * 1000)

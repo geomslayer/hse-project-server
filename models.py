@@ -14,9 +14,12 @@ class News(Document):
     category = ReferenceField(Category)
     title = StringField()
     text = StringField()
-    date = StringField()
+    date = LongField()
     img = StringField()
     link = StringField()
+    meta = {
+        'indexes': ['date']
+    }
 
 
 def init_category():
