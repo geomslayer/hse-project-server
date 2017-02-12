@@ -8,7 +8,10 @@ class ApiAppConfig(AppConfig):
         from .models import Category
         from .settings import CATS
 
-        if Category.objects.all().count() == 0:
-            for cat in CATS:
-                new_cat = Category(text=cat)
-                new_cat.save()
+        try:
+            if Category.objects.all().count() == 0:
+                for cat in CATS:
+                    new_cat = Category(text=cat)
+                    new_cat.save()
+        except Exception:
+            pass
