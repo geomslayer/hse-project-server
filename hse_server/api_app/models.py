@@ -12,3 +12,9 @@ class News(models.Model):
     date = models.BigIntegerField(db_index=True)
     img = models.CharField(max_length=200, default="")
     link = models.CharField(max_length=200, db_index=True)
+
+
+class Question(models.Model):
+    news = models.ForeignKey(News, on_delete=models.CASCADE)
+    text = models.CharField(max_length=200)
+    is_ans = models.BooleanField()

@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
-from api_app.models import Category, News
-from api_app.settings import RSS_URL
+from ...models import Category, News
+from ...settings import RSS_URL
 import feedparser
 import time
 
@@ -20,7 +20,8 @@ class Command(BaseCommand):
                 continue
 
             try:
-                news = News.objects.get(link=entry.id)
+                # trying to find the news
+                News.objects.get(link=entry.id)
                 continue
             except News.DoesNotExist:
                 pass
