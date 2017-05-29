@@ -6,6 +6,7 @@ from random import choice
 from ...models import Category, News, Question
 from ...settings import RSS_URL
 import feedparser
+import os.path
 import time
 
 MIN_LEN = 3
@@ -14,7 +15,8 @@ ATTEMPTS = 20
 HIDDEN = '________'
 
 # change for real names
-BIN_FILES = ['news1.bin', 'ruscorpora1.bin']
+BIN_FILES = ['news.bin']
+MODEL_PATH = os.path.expanduser('~/models')
 
 
 class Command(BaseCommand):
@@ -25,8 +27,8 @@ class Command(BaseCommand):
         cnt = 0
 
         morph = MorphAnalyzer()
-        word_vectors = (KeyedVectors.load_word2vec_format('../' + file, binary=True)
-                        for file in BIN_FILES)
+        word_vectors = [KeyedVectors.load_word2vec_format(
+            os.path.join(MODEL_PATH, file), binary=True) for file in BIN_FILES]
 
         # saving each news
         for entry in data.entries:
@@ -59,6 +61,7 @@ class Command(BaseCommand):
 
             original, answer, questions = generate_question(news.text, word_vectors, morph)
             if questions is None:
+                news.delete()
                 continue
 
             for question in questions:
@@ -103,8 +106,9 @@ def generate_question(text, word_vectors, morph):
     words = text_to_words(text)
     words = [word for word in words if 'NOUN' in morph.parse(word)[0].tag]
     questions = original = answer = None
-    attempts = 0
-    while attempts < ATTEMPTS and questions is None:
+    attempts_outer = 0
+    while attempts_outer < ATTEMPTS and questions is None:
+        attempts_outer += 1
         original = choice(words)
         answer = morph.parse(original)[0]
         similar = []
@@ -113,10 +117,10 @@ def generate_question(text, word_vectors, morph):
                 similar.extend(wv.most_similar(answer.normal_form + '_NOUN')[:5])
             except KeyError:
                 continue
-        if len(similar) == 0:
-            continue
         similar = list(filter(lambda elem: elem[0].split('_')[1] == 'NOUN', similar))
         similar = list(map(to_word, similar))
+        if len(similar) == 0:
+            continue
         questions = {answer.normal_form}
         attempts = 0
         while attempts < ATTEMPTS and len(questions) < QUESTIONS:
