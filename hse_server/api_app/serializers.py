@@ -11,7 +11,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class NewsSerializer(serializers.ModelSerializer):
     class Meta:
         model = News
-        fields = ('id', 'category', 'title', 'text', 'date', 'link', 'img')
+        fields = ('id', 'category', 'title', 'text', 'date', 'link', 'img', 'hidden')
 
 
 class QuestionSerializer(serializers.ModelSerializer):

@@ -6,4 +6,5 @@ urlpatterns = [
     url(r'^categories/(?P<pk>[0-9]+)/$', views.get_category),
     url(r'^news/(?P<category_id>[0-9]+)/$', views.get_news),
     url(r'^news/(?P<category_id>[0-9]+)/(?P<date>[0-9]+)/(?P<pk>[0-9]+)/$', views.get_news_before),
+    url(r'^questions/(?P<news_id>[0-9]+)/$', views.get_questions),
 ]

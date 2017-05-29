@@ -1,9 +1,9 @@
 from django.http import HttpResponse
-from rest_framework.renderers import JSONRenderer
-from .models import Category, News
-from .serializers import CategorySerializer, NewsSerializer
-from .settings import LIMIT
 from django.db.models import Q
+from rest_framework.renderers import JSONRenderer
+from .models import Category, News, Question
+from .serializers import CategorySerializer, NewsSerializer, QuestionSerializer
+from .settings import LIMIT
 
 
 class JSONResponse(HttpResponse):
@@ -35,4 +35,10 @@ def get_news_before(request, category_id, date, pk):
     news_list = News.objects.order_by('-date', '-id').filter(category_id=category_id).filter(
         Q(date__lt=date) | (Q(date=date) & Q(id__lt=pk)))[:LIMIT]
     serializer = NewsSerializer(news_list, many=True)
+    return JSONResponse(serializer.data)
+
+
+def get_questions(request, news_id):
+    questions = Question.objects.all().filter(news_id=news_id)
+    serializer = QuestionSerializer(questions, many=True)
     return JSONResponse(serializer.data)
